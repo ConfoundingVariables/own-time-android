@@ -181,13 +181,13 @@ sealed interface Alert { val at: Instant
 
 ### Stack
 
-Kotlin 2.4.20, AGP 9.4.0, Gradle 9.6.0, JDK 17, compile/target SDK 36, min SDK 31 (ADR 0002), Compose BOM 2026.09.00, Material 3 1.4.0, Room 2.8.5 with KSP, Hilt, Navigation Compose 2.10. Application id `com.addedomarus.daybudget`, app name "Day Budget" (placeholder).
+Kotlin 2.4.20, AGP 9.4.0, Gradle 9.6.0, JDK 17, compile SDK 37 (required by the Compose BOM), target SDK 36, min SDK 31 (ADR 0002), Compose BOM 2026.09.00, Material 3 1.4.0, Room 2.8.5 with KSP, Hilt, Navigation Compose 2.10. Application id `com.addedomarus.daybudget`, app name "Day Budget" (placeholder).
 
 ## Testing Decisions
 
 - A good test calls the code the way its user does and asserts a literal expected value: given these events, at this instant, in this zone, Today has exactly these rows with these durations, and the next alert is at exactly this instant. No mocks of our own code, no asserting which calls were made.
 - **Domain (`:core`, JVM unit tests):** every rule in "Timer semantics" and "Data model" through `fold` + `today`: switching, overtime, starting a spent priority, alarm once per day, Keep going, alarm timeout, midnight split, per-weekday budgets and Off days, schedule edits applying from today, adjustment clamping today and yesterday, deletion vs erase, sorting and ties, time-zone change.
-- **Storage (`:core`, Robolectric):** append and read back events through Room; triggers reject updates; erase removes a priority's events and leaves a tombstone; export produces a file that opens, passes `integrity_check`, and whose `daily_totals` match `today` for the same events.
+- **Storage (`:core`, Robolectric on SDK 35, the newest it runs on JDK 17):** append and read back events through Room; triggers reject updates; erase removes a priority's events and leaves a tombstone; export produces a file that opens, passes `integrity_check`, and whose `daily_totals` match `today` for the same events.
 - **Screens (`:app`, Roborazzi on the JVM):** Today idle, running, overtime, empty, and dark theme; editor in both budget modes; log sheet. Screenshots are reviewed images, not pixel-perfect gates.
 - **On a device (Android runner, later):** alarm rings and full-screen shows, Stop / Keep going / timeout, wrap-up, ongoing notification, lock-screen hiding, permission flows and banner, reboot mid-session, export through the share sheet.
 - No prior art yet: this is a new codebase.
