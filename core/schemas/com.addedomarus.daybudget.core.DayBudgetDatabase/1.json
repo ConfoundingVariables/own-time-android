@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d348782469c050d51b9b94a2deeee344",
+    "identityHash": "beb47f6c41ebb55124cfd9a41e7541f7",
     "entities": [
       {
         "tableName": "events",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`device_id` TEXT NOT NULL, `device_seq` INTEGER NOT NULL, `at_epoch_ms` INTEGER NOT NULL, `zone` TEXT NOT NULL, `type` TEXT NOT NULL, `priority_id` TEXT, PRIMARY KEY(`device_id`, `device_seq`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`device_id` TEXT NOT NULL, `device_seq` INTEGER NOT NULL, `at_epoch_ms` INTEGER NOT NULL, `zone` TEXT NOT NULL, `type` TEXT NOT NULL, `priority_id` TEXT NOT NULL, `name` TEXT, `color` TEXT, `wrap_up_minutes` INTEGER, `hide_on_lock_screen` INTEGER, `schedule` TEXT, `from_day` TEXT, `stop_reason` TEXT, `ended_at_epoch_ms` INTEGER, `day` TEXT, `requested_ms` INTEGER, `applied_ms` INTEGER, PRIMARY KEY(`device_id`, `device_seq`))",
         "fields": [
           {
             "fieldPath": "deviceId",
@@ -41,7 +41,63 @@
           {
             "fieldPath": "payload.priorityId",
             "columnName": "priority_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "payload.name",
+            "columnName": "name",
             "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payload.color",
+            "columnName": "color",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payload.wrapUpMinutes",
+            "columnName": "wrap_up_minutes",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "payload.hideOnLockScreen",
+            "columnName": "hide_on_lock_screen",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "payload.schedule",
+            "columnName": "schedule",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payload.fromDay",
+            "columnName": "from_day",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payload.stopReason",
+            "columnName": "stop_reason",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payload.endedAtEpochMs",
+            "columnName": "ended_at_epoch_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "payload.day",
+            "columnName": "day",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "payload.requestedMs",
+            "columnName": "requested_ms",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "payload.appliedMs",
+            "columnName": "applied_ms",
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -79,7 +135,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd348782469c050d51b9b94a2deeee344')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'beb47f6c41ebb55124cfd9a41e7541f7')"
     ]
   }
 }
