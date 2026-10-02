@@ -4,11 +4,23 @@
 
 **Blocked by:** 06
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Three skippable onboarding pages before the first Today; shown once
-- [ ] "Allow alerts" requests notification permission and, when full-screen access isn't granted, opens its settings page
-- [ ] Permission state (notifications, full-screen intent, exact alarm) read on every foreground
-- [ ] Dismissible "Alarms are off" banner on Today with Fix opening the right settings page; editor alarm line says alarms are off and links there
-- [ ] Screenshots: the three onboarding pages, Today with the banner
-- [ ] Device checks listed for the Android runner
+- [x] Three skippable onboarding pages before the first Today; shown once
+- [x] "Allow alerts" requests notification permission and, when full-screen access isn't granted, opens its settings page
+- [x] Permission state (notifications, full-screen intent, exact alarm) read on every foreground
+- [x] Dismissible "Alarms are off" banner on Today with Fix opening the right settings page; editor alarm line says alarms are off and links there
+- [x] Screenshots: the three onboarding pages, Today with the banner
+- [x] Device checks listed for the Android runner
+
+## Verification
+
+- Roborazzi: `onboarding`, `today-alarms-off`.
+
+## Defaults I took
+
+- Onboarding is skipped with the Skip button or by starting Today; both set the same preference.
+
+## On the Android runner
+
+- First run shows onboarding, Allow alerts requests notification permission and points at the full-screen-intent page; skipping then shows the banner with Fix.
