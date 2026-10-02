@@ -206,6 +206,27 @@ fun delete(ledger: Ledger, id: PriorityId, now: Instant): List<Event> = listOfNo
     Event.PriorityDeleted(id),
 )
 
+/** The alarm at [alarmAt] went unanswered: the session it rang for still runs and nobody chose Keep going. */
+fun unanswered(ledger: Ledger, id: PriorityId, alarmAt: Instant): Boolean {
+    val running = ledger.running ?: return false
+    return running.id == id && running.start < alarmAt &&
+        ledger.keptGoing.none { it.event.id == id && it.at >= alarmAt }
+}
+
+/**
+ * When the running budget ran out while no alarm could ring (the phone was off), the instant it ran out;
+ * null if it hasn't, if the priority was started already spent, or if Keep going was chosen.
+ */
+fun missedAlarm(ledger: Ledger, now: Instant, zone: ZoneId): Instant? {
+    val session = ledger.running ?: return null
+    val row = today(ledger, now, zone).running ?: return null
+    if (row.overtime <= ZERO) return null
+    val atStart = today(ledger, session.start, zone).running ?: return null
+    if (atStart.remaining <= ZERO || atStart.budget <= ZERO) return null
+    val ranOut = maxOf(now - row.overtime, session.start)
+    return ranOut.takeIf { unanswered(ledger, session.id, it) }
+}
+
 /** Arcs of the ring as fractions of the full circle, clockwise from 12 o'clock. */
 data class Arc(val id: PriorityId, val start: Float, val sweep: Float, val spent: Boolean)
 

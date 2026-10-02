@@ -111,6 +111,28 @@ class DomainTest {
         assertEquals(listOf(row("Gym", 1.hours, 1.hours)), todayAt("11:00").table())
     }
 
+    @Test fun anAlarmIsUnansweredUntilStoppedOrKeptGoing() {
+        create(gym, 60)
+        record("09:00", SessionStarted(gym.id))
+
+        assertEquals(true, unanswered(ledger(), gym.id, at("10:00")))
+        record("10:00:20", KeptGoing(gym.id))
+        assertEquals(false, unanswered(ledger(), gym.id, at("10:00")))
+    }
+
+    @Test fun aBudgetThatRanOutWhileThePhoneWasOffEndsWhenItRanOut() {
+        create(gym, 60); create(read, 30)
+        record("09:00", SessionStarted(gym.id))
+
+        assertEquals(at("10:00"), missedAlarm(ledger(), at("11:30"), dubai))
+        assertEquals(null, missedAlarm(ledger(), at("09:30"), dubai))
+
+        record("12:00", *tap(ledger(), read.id, at("12:00")).toTypedArray())
+        record("12:30", *tap(ledger(), read.id, at("12:30")).toTypedArray())
+        record("13:00", SessionStarted(read.id))
+        assertEquals(null, missedAlarm(ledger(), at("14:00"), dubai))
+    }
+
     @Test fun anAdjustmentThatGivesTimeBackReArmsTheAlarm() {
         create(gym, 60)
         record("09:00", SessionStarted(gym.id))
