@@ -4,3 +4,9 @@
 # Orb portal manifests and review artifacts
 .amp/portals/
 .amp/in/
+
+# Android local SDK path and build outputs
+local.properties
+.gradle/
+build/
+.kotlin/

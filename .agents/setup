@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+sdk_root="$HOME/android-sdk"
+cmdline_tools_zip="commandlinetools-linux-15859902_latest.zip"
+step() { echo "[setup $(date +%T)] $*"; }
+
+step "JDK 17"
+if ! dpkg -s openjdk-17-jdk-headless >/dev/null 2>&1; then
+  sudo apt-get update -qq
+  sudo apt-get install -y -qq openjdk-17-jdk-headless
+fi
+java_home="$(dirname "$(dirname "$(readlink -f "$(command -v javac)")")")"
+
+step "Android command-line tools"
+if [ ! -x "$sdk_root/cmdline-tools/latest/bin/sdkmanager" ]; then
+  tmp="$(mktemp -d)"
+  curl -fsSL "https://dl.google.com/android/repository/$cmdline_tools_zip" -o "$tmp/tools.zip"
+  unzip -q "$tmp/tools.zip" -d "$tmp"
+  mkdir -p "$sdk_root/cmdline-tools"
+  rm -rf "$sdk_root/cmdline-tools/latest"
+  mv "$tmp/cmdline-tools" "$sdk_root/cmdline-tools/latest"
+  rm -rf "$tmp"
+fi
+
+step "Android SDK packages"
+sdkmanager="$sdk_root/cmdline-tools/latest/bin/sdkmanager"
+export JAVA_HOME="$java_home"
+{ yes || true; } | "$sdkmanager" --sdk_root="$sdk_root" --licenses >/dev/null
+"$sdkmanager" --sdk_root="$sdk_root" "platform-tools" "platforms;android-36" "build-tools;36.0.0" >/dev/null
+
+step "Login shell environment"
+marker="# day-budget Android toolchain"
+if ! grep -Fqx "$marker" "$HOME/.bash_profile" 2>/dev/null; then
+  cat >> "$HOME/.bash_profile" <<EOF
+
+$marker
+export JAVA_HOME="$java_home"
+export ANDROID_HOME="$sdk_root"
+export PATH="\$ANDROID_HOME/platform-tools:\$ANDROID_HOME/cmdline-tools/latest/bin:\$PATH"
+EOF
+fi
+[ -f "$repo_root/local.properties" ] || echo "sdk.dir=$sdk_root" > "$repo_root/local.properties"
+
+step "Agent skills (not committed)"
+skills="$repo_root/.agents/skills"
+checkout() { # repo sha -> prints dir
+  local tmp; tmp="$(mktemp -d)"
+  git -C "$tmp" init -q
+  git -C "$tmp" fetch -q --depth 1 "https://github.com/$1" "$2"
+  git -C "$tmp" checkout -q FETCH_HEAD
+  echo "$tmp"
+}
+if [ ! -f "$skills/poteto-mode/SKILL.md" ] || [ ! -f "$skills/to-tickets/SKILL.md" ]; then
+  mkdir -p "$skills"
+  mp="$(checkout mattpocock/skills d81f3a183412e71a5b1e84ca21bc1a35eea03a60)"
+  cp -r "$mp"/skills/{engineering,productivity}/*/ "$skills/"
+  cp "$mp/LICENSE" "$skills/MATTPOCOCK-LICENSE"
+  cursor="$(checkout cursor/plugins 7022c81efb48d8b5eb15498ce6043a3bd74b694c)"
+  for dir in "$cursor"/pstack/skills/*/ "$cursor/cursor-team-kit/skills/deslop/"; do
+    case "$(basename "$dir")" in make-bot-ui|setup-pstack|automate-me|typescript-best-practices|teach) continue ;; esac
+    rm -rf "$skills/$(basename "$dir")"
+    cp -r "$dir" "$skills/"
+  done
+  mkdir -p "$skills/poteto-mode/agents"
+  cp "$cursor"/pstack/agents/*.md "$skills/poteto-mode/agents/"
+  cp "$cursor/pstack/LICENSE" "$skills/PSTACK-LICENSE"
+  sed -i '0,/^name: Poteto Mode$/s//name: poteto-mode/' "$skills/poteto-mode/SKILL.md"
+  rm -rf "$mp" "$cursor"
+fi
+
+if [ -x "$repo_root/gradlew" ]; then
+  step "Gradle dependencies"
+  (cd "$repo_root" && ANDROID_HOME="$sdk_root" ./gradlew --quiet help)
+fi
+step "done"
