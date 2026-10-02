@@ -1,2 +1,6 @@
 # Installed agent skills (mattpocock/skills), not committed
 .agents/skills/
+
+# Orb portal manifests and review artifacts
+.amp/portals/
+.amp/in/
