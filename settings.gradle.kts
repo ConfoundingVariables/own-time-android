@@ -14,4 +14,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "day-budget"
-include(":core")
+include(":app", ":core")

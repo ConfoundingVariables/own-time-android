@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Day Budget</string>
+    <string name="today">Today</string>
+    <string name="nothing_planned">Nothing planned today</string>
+    <string name="add_first_priority">Add your first priority</string>
+</resources>
