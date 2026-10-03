@@ -12,6 +12,7 @@ Native Android app: personal daily time budgets ("a chess clock for your day"). 
 - Follow pstack's development guidance (`poteto-mode` and the `principle-*` skills) to reach v1 with the least code: name the data shape first, keep rules pure in `:core`, tests assert observable behaviour against literal values, run `deslop` and `no-comments` before committing, prove it works on the real artifact.
 - Check command: `./gradlew assembleDebug testDebugUnitTest` builds the debug APK and runs every JVM, Robolectric, and Roborazzi test. Screenshots are recorded to `app/build/screenshots/` for review, not compared. `./gradlew assembleRelease` (debug-signed) produces the installable APK.
 - Device-only behaviour (alarms, notifications, permissions, share sheet) can't run in an orb; list each such check in its ticket for the Android runner.
+- Image honesty: claim to have seen an image only when its content is actually readable in context; a tool returning a URL or JSON metadata is not seeing it. <if applicable>When you cannot view an image, hand its URL to a subagent for a description and report the answer as secondhand.</if applicable>
 
 ## Agent skills
 
